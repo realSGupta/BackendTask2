@@ -89,7 +89,7 @@ This project uses a **Mock DEX Router** to simulate network interactions.
 
 ## 🚀 Live Demo
 
-> **🌐 Deployed URL**: [Add your deployment URL here after deploying]
+> **🌐 Deployed URL**: https://backendtask2-production.up.railway.app
 
 > **🎥 Demo Video**: [Add your YouTube video link here]
 
