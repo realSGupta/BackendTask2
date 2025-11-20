@@ -1,0 +1,260 @@
+{
+    "info": {
+        "name": "Order Execution Engine API",
+        "description": "API collection for the Solana DEX Order Execution Engine with Market Order support, DEX routing (Raydium vs Meteora), and WebSocket status updates.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": "1.0.0"
+    },
+    "item": [
+        {
+            "name": "Orders",
+            "item": [
+                {
+                    "name": "Execute Market Order - SOL to USDC",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/execute",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "execute"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"USDC\",\n  \"amount\": 1.5,\n  \"side\": \"BUY\"\n}"
+                        },
+                        "description": "Submit a market order to buy USDC with SOL. The system will:\n1. Create order in database (status: PENDING)\n2. Add to BullMQ queue\n3. Return orderId immediately\n4. Worker processes: ROUTING → BUILDING → SUBMITTED → CONFIRMED"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Execute Market Order - Large Amount",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/execute",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "execute"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"tokenIn\": \"USDC\",\n  \"tokenOut\": \"SOL\",\n  \"amount\": 1000,\n  \"side\": \"SELL\"\n}"
+                        },
+                        "description": "Test with larger amount to see different routing decisions"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Execute Market Order - Alt Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/execute",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "execute"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"BONK\",\n  \"amount\": 0.5,\n  \"side\": \"BUY\"\n}"
+                        },
+                        "description": "Test order with alternative token pair"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Batch Submit - 5 Concurrent Orders",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/execute",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "execute"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"USDC\",\n  \"amount\": 2.0,\n  \"side\": \"BUY\"\n}"
+                        },
+                        "description": "Run this request 5 times quickly (use Runner with 5 iterations) to test concurrent order processing. The queue should handle all orders with max 10 concurrent workers."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Invalid Order - Missing Fields",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/execute",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "execute"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"tokenIn\": \"SOL\",\n  \"amount\": 1.5\n}"
+                        },
+                        "description": "Test validation - should return 400 error for missing tokenOut and side"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Invalid Order - Negative Amount",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/execute",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "execute"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"USDC\",\n  \"amount\": -5,\n  \"side\": \"BUY\"\n}"
+                        },
+                        "description": "Test validation - should return 400 error for negative amount"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Order execution endpoints"
+        },
+        {
+            "name": "WebSocket",
+            "item": [
+                {
+                    "name": "WebSocket Connection",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "ws://{{base_url}}/api/orders/ws?orderId={{orderId}}",
+                            "protocol": "ws",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "ws"
+                            ],
+                            "query": [
+                                {
+                                    "key": "orderId",
+                                    "value": "{{orderId}}",
+                                    "description": "Order ID from execute endpoint response"
+                                }
+                            ]
+                        },
+                        "description": "Connect to WebSocket to receive real-time order status updates.\n\nExpected message flow:\n1. {\"status\": \"connected\", \"orderId\": \"...\"}\n2. {\"status\": \"pending\"}\n3. {\"status\": \"routing\"}\n4. {\"status\": \"building\", \"quote\": {...}}\n5. {\"status\": \"submitted\"}\n6. {\"status\": \"confirmed\", \"txHash\": \"...\", \"executedPrice\": 100.23}\n\nOR if error:\n6. {\"status\": \"failed\", \"error\": \"...\"}\n\nNote: Use a WebSocket client like Postman's WebSocket support or a browser extension."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "WebSocket endpoints for real-time updates"
+        },
+        {
+            "name": "Health Check",
+            "item": [
+                {
+                    "name": "Server Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                ""
+                            ]
+                        },
+                        "description": "Check if server is running"
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3000",
+            "type": "string"
+        },
+        {
+            "key": "orderId",
+            "value": "",
+            "type": "string",
+            "description": "Set this after executing an order"
+        }
+    ]
+}
