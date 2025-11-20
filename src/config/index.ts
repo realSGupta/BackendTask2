@@ -10,4 +10,5 @@ export const config = {
     db: {
         url: process.env.DATABASE_URL,
     },
+    liteMode: true, // Force lite mode for deployment without DBs
 };
