@@ -84,3 +84,116 @@ Connect to: `ws://localhost:3000/api/orders/ws?orderId={orderId}`
 This project uses a **Mock DEX Router** to simulate network interactions.
 - **Delays**: Realistic network delays (200ms - 3s) are simulated.
 - **Prices**: Random price variations (~2-5%) are generated to demonstrate routing logic.
+
+---
+
+## 🚀 Live Demo
+
+> **🌐 Deployed URL**: [Add your deployment URL here after deploying]
+
+> **🎥 Demo Video**: [Add your YouTube video link here]
+
+---
+
+## 📦 Deliverables
+
+### ✅ Completed
+- [x] GitHub repository with clean commits
+- [x] API with order execution and routing
+- [x] WebSocket status updates (in code)
+- [x] Mock DEX implementation
+- [x] Comprehensive documentation (README, setup guides)
+- [x] Unit tests (10+ tests)
+- [x] Integration tests
+- [x] Postman collection (`postman_collection.json`)
+
+### 🔄 Pending (After Dependency Installation)
+- [ ] Deploy to free hosting (Railway/Render/Fly.io)
+  - See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+- [ ] Record 1-2 min demo video
+  - See [VIDEO_GUIDE.md](VIDEO_GUIDE.md)
+- [ ] Run full test suite
+  - `npm test`
+
+---
+
+## 📁 Project Files
+
+- `src/` - Source code
+  - `app.ts` - Main server
+  - `api/orders.ts` - Order routes
+  - `services/` - Business logic (Router, Queue, WebSocket)
+  - `config/` - Configuration
+  - `db/` - Database client
+- `tests/` - Unit and integration tests
+- `prisma/` - Database schema
+- `postman_collection.json` - API collection
+- `demo-server.js` - Standalone demo (no dependencies)
+- `test-client.js` - Test client for demo
+- `DEPLOYMENT_GUIDE.md` - Deployment instructions
+- `VIDEO_GUIDE.md` - Video recording guide
+- `SETUP_GUIDE.md` - Network troubleshooting
+
+---
+
+## 🎯 Quick Test (Demo Server)
+
+If dependencies aren't installed yet:
+
+```bash
+# Run demo server (no dependencies needed)
+node demo-server.js
+
+# In another terminal, run test client
+node test-client.js
+
+# Or open browser
+http://localhost:3000
+```
+
+---
+
+## 📊 Architecture Diagram
+
+```
+Client → POST /api/orders/execute
+    ↓
+  Create Order (DB)
+    ↓
+  Add to BullMQ Queue
+    ↓
+  Return orderId
+    ↓
+  Client connects via WebSocket
+    ↓
+Worker processes:
+  1. ROUTING (query Raydium & Meteora)
+  2. BUILDING (prepare transaction)
+  3. SUBMITTED (send to network)
+  4. CONFIRMED (update DB, send txHash)
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+# Unit tests
+npm test
+
+# Integration tests  
+npm test -- integration
+
+# Test coverage
+npm test -- --coverage
+```
+
+---
+
+## 📞 Support
+
+For issues with:
+- **Dependencies**: See [SETUP_GUIDE.md](SETUP_GUIDE.md)
+- **Deployment**: See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+- **Video Recording**: See [VIDEO_GUIDE.md](VIDEO_GUIDE.md)
+
